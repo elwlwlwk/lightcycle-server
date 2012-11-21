@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
 import asyncore
 import socket
+import sqlite3
+class gamedb:
+	def __init__(self, name='lcdb'):
+		self.conn=sqlite3.connect(name)
+		c=self.conn.cursor()
+		try:
+			c.execute('create table game (data text)')
+		except sqlite3.OperationalError:
+			print('Table already exist.')
+
+	def add(self, data):
+		c=self.conn.cursor()
+		c.execute('insert into game values (?)',(data,))
+		self.conn.commit()
+		c.close
 
 class Player:
 	def __init__(self, socket, ID):
@@ -15,6 +30,7 @@ class EchoHandler(asyncore.dispatcher_with_send):
 		print('message is '+data)
 		header = data.split()[0]
 		body = data.split()[1]
+		db.add(body) #TODO: Use db for specific data.
 		if 'HELO' == header:
 			players.append(Player(self, body))
 		elif 'FUCKYOU' == header:
@@ -36,6 +52,7 @@ class EchoServer(asyncore.dispatcher):
 		handler = EchoHandler(sock)
 
 if __name__ == "__main__":
+	db=gamedb()
 	players = []
 	server = EchoServer('0.0.0.0', 9999)
 	asyncore.loop()
