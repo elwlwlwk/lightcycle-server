@@ -62,8 +62,6 @@ class EchoHandler(asyncore.dispatcher_with_send):
 					each.socket.sendall(startmsg.strip())
 		else:
 			print('Unknown message! The header is '+header)
-			for each in players:
-				each.socket.sendall(data.encode())
 
 class EchoServer(asyncore.dispatcher):
 	def __init__(self, host, port):
