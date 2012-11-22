@@ -21,24 +21,45 @@ class Player:
 	def __init__(self, socket, ID):
 		self.socket = socket
 		self.ID = ID
+		self.ready= 0
 
 class EchoHandler(asyncore.dispatcher_with_send):
 	def handle_read(self):
 		data = self.recv(1024)
-		data = str(data).strip()
+		data = str(data).strip();
 		print('accept from clint')
 		print('message is '+data)
-		header = data.split()[0]
-		body = data.split()[1]
-		db.add(body) #TODO: Use db for specific data.
-		if 'HELO' == header:
+		splited= data.split()
+		header = splited[0]
+		if len(splited) > 1:
+			body = splited[1]
+			db.add(body) #TODO: Use db for specific data.
+		if 'HELO' in header:
 			players.append(Player(self, body))
-		elif 'FUCKYOU' == header:
+		elif 'MGHG' in header:
 			for each in players:
-				if each.socket is not self:
-					each.socket.send(data.encode('utf-8'))
+#				if each.socket is not self:
+				each.socket.send(data.encode('utf-8')+' '.encode('utf-8')+str(each.ID).encode('utf-8'))
+		elif 'READY' in header:
+			for each in players:
+				if each.socket is self:
+					print('set readey '+each.ID)
+					each.ready= 1
+			AllReadyed= 1
+			for each in players:
+				print(each.ID+' is '+str(each.ready))
+				AllReadyed= AllReadyed* each.ready
+			if AllReadyed is 1:
+				print('all clients are ready')
+				for each in players:
+					print('send start message')
+					SMsg= 'START'.encode('UTF-8')
+					each.socket.send(SMsg.strip())
+				
 		else:
 			print('Unknown message! The header is '+header)
+			for each in players:
+				each.socket.send(data.encode('utf-8'))
 
 class EchoServer(asyncore.dispatcher):
 	def __init__(self, host, port):
