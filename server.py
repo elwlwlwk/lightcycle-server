@@ -87,6 +87,7 @@ class EchoServer(asyncore.dispatcher):
 		handler = EchoHandler(sock)
 
 if __name__ == "__main__":
+	print('Server started...')
 	players = []
 	server = EchoServer('0.0.0.0', 9999)
 	try:
