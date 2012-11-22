@@ -15,7 +15,7 @@ class gamedb:
 
 	def add(self, data):
 		c = self.conn.cursor()
-		c.execute('insert into game values (?)',(data,))
+		c.execute('insert into game values (?)', (data, ))
 		self.conn.commit()
 		c.close
 
@@ -33,24 +33,24 @@ class EchoHandler(asyncore.dispatcher_with_send):
 		data = self.recv(1024)
 		data = data.decode().strip()
 		print('accept from clint')
-		print('message is '+data)
+		print('message is ' + data)
 		splited = data.split()
 		header = splited[0]
 		if len(splited) > 1:
-			body = data[len(header)+1:]
+			body = data[len(header) + 1:]
 		if 'HELO' == header:
 			players.append(Player(self, body))
 			if len(players) == 2:
 				data = ''
 				for each in players:
-					data = data+each.ID+' '
+					data = data + each.ID + ' '
 				data = data[:-1]
 				for each in players:
 					each.socket.sendall(data.encode())
 		elif 'MGHG' == header:
 			for each in players:
 				if each.socket is not self:
-					msg = data+ ' ' +str(each.ID)
+					msg = data + ' ' + str(each.ID)
 					each.socket.sendall(msg.encode())
 		elif 'WIN' == header:
 			self.db.add(body)
@@ -60,11 +60,11 @@ class EchoHandler(asyncore.dispatcher_with_send):
 		elif 'READY' == header:
 			for each in players:
 				if each.socket is self:
-					print('set ready '+each.ID)
+					print('set ready ' + each.ID)
 					each.ready = 1
 			allready = 1
 			for each in players:
-				print(each.ID+' is '+str(each.ready))
+				print(each.ID + ' is ' + str(each.ready))
 				allready *= each.ready
 			if allready is 1:
 				print('all clients are ready')
@@ -73,7 +73,7 @@ class EchoHandler(asyncore.dispatcher_with_send):
 					startmsg = 'START'.encode()
 					each.socket.sendall(startmsg.strip())
 		else:
-			print('Unknown message! The header is '+header)
+			print('Unknown message! The header is ' + header)
 
 class EchoServer(asyncore.dispatcher):
 	def __init__(self, host, port):
