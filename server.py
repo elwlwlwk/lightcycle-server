@@ -24,9 +24,9 @@ class Player:
 		self.ready = 0
 
 class EchoHandler(asyncore.dispatcher_with_send):
-	def __init__(self):
-		asyncore.dispatcher_with_send.__init__(self)
-		self.db=gamedb()
+	def __init__(self, sock = None, map = None):
+		asyncore.dispatcher_with_send.__init__(self, sock, map)
+		self.db = gamedb()
 	def handle_read(self):
 		data = self.recv(1024)
 		data = data.decode().strip()
