@@ -38,10 +38,17 @@ class EchoHandler(asyncore.dispatcher_with_send):
 			body = data[len(header):]
 		if 'HELO' == header:
 			players.append(Player(self, body))
+			if len(players) == 2:
+				data = ''
+				for each in players:
+					data = data+each.ID+' '
+				data = data[:-1]
+				for each in players:
+					each.socket.sendall(data.encode())
 		elif 'MGHG' == header:
 			for each in players:
 				if each.socket is not self:
-					msg = data+' '+str(each.ID)
+					msg = data+ ' ' +str(each.ID)
 					each.socket.sendall(msg.encode())
 		elif 'WIN' == header:
 			self.db.add(body)
