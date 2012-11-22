@@ -79,4 +79,7 @@ class EchoServer(asyncore.dispatcher):
 if __name__ == "__main__":
 	players = []
 	server = EchoServer('0.0.0.0', 9999)
-	asyncore.loop()
+	try:
+		asyncore.loop()
+	except:
+		print("Game finished. Shutting down server...")
