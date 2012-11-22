@@ -24,16 +24,18 @@ class Player:
 		self.ready = 0
 
 class EchoHandler(asyncore.dispatcher_with_send):
+	def __init__(self):
+		asyncore.dispatcher_with_send.__init__(self)
+		self.db=gamedb()
 	def handle_read(self):
 		data = self.recv(1024)
-		data = data.decode().strip();
+		data = data.decode().strip()
 		print('accept from clint')
 		print('message is '+data)
 		splited = data.split()
 		header = splited[0]
 		if len(splited) > 1:
 			body = data[len(header):]
-			db.add(body) #TODO: Use db for specific data.
 		if 'HELO' == header:
 			players.append(Player(self, body))
 		elif 'MGHG' == header:
@@ -41,6 +43,8 @@ class EchoHandler(asyncore.dispatcher_with_send):
 				if each.socket is not self:
 					msg = data+' '+str(each.ID)
 					each.socket.sendall(msg.encode())
+		elif 'WIN' == header:
+			self.db.add(body)
 		elif 'READY' == header:
 			for each in players:
 				if each.socket is self:
@@ -73,7 +77,6 @@ class EchoServer(asyncore.dispatcher):
 		handler = EchoHandler(sock)
 
 if __name__ == "__main__":
-	db = gamedb()
 	players = []
 	server = EchoServer('0.0.0.0', 9999)
 	asyncore.loop()
