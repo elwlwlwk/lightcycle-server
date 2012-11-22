@@ -37,7 +37,7 @@ class EchoHandler(asyncore.dispatcher_with_send):
 		splited = data.split()
 		header = splited[0]
 		if len(splited) > 1:
-			body = data[len(header):]
+			body = data[len(header)+1:]
 		if 'HELO' == header:
 			players.append(Player(self, body))
 			if len(players) == 2:
