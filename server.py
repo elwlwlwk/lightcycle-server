@@ -2,6 +2,8 @@
 import asyncore
 import socket
 import sqlite3
+import sys
+
 class gamedb:
 	def __init__(self, name = 'lcdb'):
 		self.conn = sqlite3.connect(name)
@@ -52,6 +54,9 @@ class EchoHandler(asyncore.dispatcher_with_send):
 					each.socket.sendall(msg.encode())
 		elif 'WIN' == header:
 			self.db.add(body)
+			print('The winner is ' + body + '!')
+			print('Shutting down the server...')
+			sys.exit()
 		elif 'READY' == header:
 			for each in players:
 				if each.socket is self:
@@ -88,3 +93,4 @@ if __name__ == "__main__":
 		asyncore.loop()
 	except:
 		print("Game finished. Shutting down server...")
+		sys.exit()
